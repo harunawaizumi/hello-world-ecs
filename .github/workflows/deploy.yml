@@ -1,3 +1,10 @@
+name: Deploy to Amazon ECS
+
+# ↓ここが「いつ動くか」の定義です
+on:
+  push:
+    branches: [ "main" ]  # mainブランチにプッシュされた時に動く
+
 permissions:
   id-token: write # これが OIDC を使うために必須！
   contents: read
