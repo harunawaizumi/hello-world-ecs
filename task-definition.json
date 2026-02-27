@@ -1,5 +1,5 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:785621645164:task-definition/hello-world-task-v2:1",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:785621645164:task-definition/hello-world-task-v2:2",
     "containerDefinitions": [
         {
             "name": "hellow-world-v2",
