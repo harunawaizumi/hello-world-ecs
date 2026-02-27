@@ -1,76 +1,30 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:785621645164:task-definition/hello-world-task-v2:4",
     "containerDefinitions": [
         {
             "name": "hellow-world-v2",
-            "image": "785621645164.dkr.ecr.ap-northeast-1.amazonaws.com/hellow-world:v2",
+            "image": "785621645164.dkr.ecr.ap-northeast-1.amazonaws.com/hellow-world:latest", 
             "cpu": 0,
             "portMappings": [
                 {
-                    "name": "hellow-world-v2-80-tcp",
                     "containerPort": 80,
                     "hostPort": 80,
-                    "protocol": "tcp",
-                    "appProtocol": "http"
+                    "protocol": "tcp"
                 }
             ],
             "essential": true,
-            "environment": [],
-            "environmentFiles": [],
-            "mountPoints": [],
-            "volumesFrom": [],
-            "ulimits": [],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
                     "awslogs-group": "/ecs/hello-world-task-v2",
-                    "awslogs-create-group": "true",
                     "awslogs-region": "ap-northeast-1",
                     "awslogs-stream-prefix": "ecs"
-                },
-                "secretOptions": []
-            },
-            "systemControls": []
+                }
+            }
         }
     ],
     "family": "hello-world-task-v2",
     "executionRoleArn": "arn:aws:iam::785621645164:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 1,
-    "volumes": [],
-    "status": "ACTIVE",
-    "requiresAttributes": [
-        {
-            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
-        },
-        {
-            "name": "ecs.capability.execution-role-awslogs"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.ecr-auth"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
-        },
-        {
-            "name": "ecs.capability.execution-role-ecr-pull"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-        },
-        {
-            "name": "ecs.capability.task-eni"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
-        }
-    ],
-    "placementConstraints": [],
-    "compatibilities": [
-        "EC2",
-        "MANAGED_INSTANCES",
-        "FARGATE"
-    ],
     "requiresCompatibilities": [
         "FARGATE"
     ],
@@ -79,8 +33,5 @@
     "runtimePlatform": {
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
-    },
-    "registeredAt": "2026-02-24T22:27:15.326Z",
-    "registeredBy": "arn:aws:iam::785621645164:root",
-    "tags": []
+    }
 }

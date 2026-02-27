@@ -28,15 +28,27 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push image to Amazon ECR
+　　　- name: Build, tag, and push image to Amazon ECR
+        id: build-image
         run: |
-          docker build -t hello-world .
-          docker tag hello-world:latest ${{ steps.login-ecr.outputs.registry }}/hellow-world:latest
-          docker push ${{ steps.login-ecr.outputs.registry }}/hellow-world:latest
+          IMAGE_TAG=${{ github.sha }}
+          REGISTRY=${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY=hellow-world
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          echo "image=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: hellow-world-v2
+          image: ${{ steps.build-image.outputs.image }}
 
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: task-definition.json
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: hello-world-task-v2-service-fx1rm85e
           cluster: hello-world-cluster
