@@ -1,33 +1,32 @@
 name: Deploy to Amazon ECS
 
-# ↓ここが「いつ動くか」の定義です
 on:
   push:
-    branches: [ "main" ]  # mainブランチにプッシュされた時に動く
+    branches: [ "main" ]
 
 permissions:
-  id-token: write # これが OIDC を使うために必須！
+  id-token: write
   contents: read
 
 jobs:
-  deploy:
+  # --- ジョブ1: テスト環境（Staging）へのデプロイ ---
+  deploy-staging:
     runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ここが OIDC の魔法の部分
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::785621645164:role/GitHubActionsRole # 作ったロールのARN
+          role-to-assume: arn:aws:iam::785621645164:role/GitHubActionsRole
           aws-region: ap-northeast-1
 
-      # これ以降は今までと同じ（docker build, push など）
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
@@ -47,9 +46,42 @@ jobs:
           container-name: hellow-world-v2
           image: ${{ steps.build-image.outputs.image }}
 
-      - name: Deploy to Amazon ECS
+      - name: Deploy to Staging (Test Environment)
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
+          # 【重要】AWS側で作った「テスト用サービス」の名前をここに書く
+          service: hello-world-staging-service 
+          cluster: hello-world-cluster
+
+  # --- ジョブ2: 本番環境（Production）へのデプロイ ---
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: deploy-staging         # テスト環境のデプロイが終わるまで待つ
+    environment: production       # GitHub上で「承認ボタン」が必要になる設定
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::785621645164:role/GitHubActionsRole
+          aws-region: ap-northeast-1
+
+      # テスト環境で使ったのと同じイメージを本番にも使う
+      - name: Fill in the image ID
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: hellow-world-v2
+          image: ${{ steps.login-ecr.outputs.registry }}/hellow-world:${{ github.sha }}
+
+      - name: Deploy to Production
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          # 【重要】本番用サービスの名前
           service: hello-world-task-v2-service-fx1rm85e
           cluster: hello-world-cluster
