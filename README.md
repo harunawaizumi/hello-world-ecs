@@ -13,6 +13,9 @@
 | **5** | **手動承認** | GitHub | 内容に問題がなければ、GitHub Actions 上に表示される **「承認ボタン」** をクリック。 |
 | **6** | **本番デプロイ (CD)** | GitHub Actions | 承認後、直ちに本番用のサービスが更新され、新しいバージョンが公開される。 |
 
+![ecs-screenshot.png]([https://github.com/harunawaizumi/hello-world-ecs/blob/main/ecs-screenshot.png])
+
+
 ---
 
 ## 2. タスク定義が更新されるタイミング
